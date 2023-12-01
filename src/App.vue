@@ -5,10 +5,12 @@
       <router-link to="/about">Tombola</router-link>
     </nav>
   </div>
-  <router-view />
-  <footer>
+  <div class="main">
+    <router-view />
+  </div>
+  <!-- <footer>
     <h3>il footer</h3>
-  </footer>
+  </footer> -->
 </template>
 
 <style>
@@ -18,17 +20,13 @@
   box-sizing: border-box;
 }
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+html {
+  font-family: 'Courgette', cursive;
 }
 
 .menu {
   width: 100%;
-  padding: 50px 0;
+  padding: 35px 0;
   background-color: #A63F03;
 }
 
@@ -43,19 +41,26 @@ nav a {
   font-weight: bold;
   color: white;
   text-decoration: none;
-
+  font-size: 1.3rem;
 }
 
 nav a.router-link-exact-active {
   color: rgb(184, 184, 57);
 }
 
+.main {
+  overflow-y: auto;
+  width: 100%;
+  height: calc(100vh - 96px);
+}
+
 footer {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   padding: 1rem 0;
+  background-color: red;
 }
 
 footer h3 {
