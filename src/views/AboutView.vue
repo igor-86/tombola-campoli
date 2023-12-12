@@ -1,7 +1,10 @@
 <!-- TabelloneTombola.vue -->
 <template>
   <div>
-    <ModalNumber :isVisible="mostraModal" />
+    <ModalNumber :isVisible="mostraModalNumero" :numeroEstratto="numeroCasuale" />
+    <ModalPartitaFinita :isVisible="mostraModalPartitaFinita" :numeroEstratto="numeroCasuale"
+      @resetta-partita="resettaPartita" />
+    <ModalFinePartita :isVisible="mostraResettaPartita" @resetta-partita="resettaPartita" />
   </div>
   <div class="area">
     <div class="titolo">
@@ -9,13 +12,17 @@
     </div>
     <div class="gioco">
       <div class="row" v-for="(row, rowIndex) in tabellone" :key="rowIndex">
-        <div class="numero" v-for="(numero, columnIndex) in row" :key="columnIndex">
-          <p>{{ numero }}</p>
+        <div class="numero" v-for="(numero, columnIndex) in row" :key="columnIndex"
+          :class="{ 'estratto': numeriEstratti.includes(numero) && !mostraModalNumero }">
+          <p :class="{ 'bianco': numeriEstratti.includes(numero) && !mostraModalNumero }">
+            {{ numero }}
+          </p>
         </div>
       </div>
     </div>
     <div class="game">
-      <button id="newgame" @click="avviaPartita">Nuova partita</button>
+      <button v-if="!nuovaPartita" id="newgame" @click="avviaPartita">Nuova partita</button>
+      <button v-if="nuovaPartita" id="endgame" @click="partitaReset">Fine partita</button>
       <div v-if="nuovaPartita" class="newgame">
         <button id="estract" @click="estraiNumero">Estrai numero</button>
         <div class="form" v-for="(premio, index) in listaPremi" :key="index">
@@ -29,9 +36,13 @@
 
 <script>
 import ModalNumber from '@/components/ModalNumber.vue';
+import ModalPartitaFinita from '@/components/ModalPartitaFinita.vue';
+import ModalFinePartita from '@/components/ModalFinePartita.vue';
 export default {
   components: {
-    ModalNumber
+    ModalNumber,
+    ModalPartitaFinita,
+    ModalFinePartita
   },
   data() {
     return {
@@ -46,7 +57,11 @@ export default {
         { label: "Tombolino", stato: false },
 
       ],
-      mostraModal: false
+      mostraModalNumero: false,
+      mostraModalPartitaFinita: false,
+      mostraResettaPartita: false,
+      numeroCasuale: null,
+      numeriEstratti: []
     };
   },
   methods: {
@@ -63,13 +78,60 @@ export default {
     },
     avviaPartita() {
       this.nuovaPartita = true;
+      this.bottonStart = false;
     },
-    estraiNumero() {
+    /* estraiNumero() {
+      const numeroCasuale = Math.floor(Math.random() * 90) + 1;
+      this.numeroEstratto = numeroCasuale;
       this.mostraModal = true;
 
       setTimeout(() => {
         this.mostraModal = false;
       }, 3000);
+    } */
+    estraiNumero() {
+      if (this.partitaFinita) {
+        return;
+      }
+
+      // Logica per estrarre un numero casuale che non è stato ancora estratto
+      do {
+        this.numeroCasuale = Math.floor(Math.random() * 90) + 1;
+      } while (this.numeriEstratti.includes(this.numeroCasuale));
+
+      // Aggiungi il numero estratto all'array
+      this.numeriEstratti.push(this.numeroCasuale);
+      console.log(this.numeriEstratti);
+
+      // Passa il numero estratto come prop a ModalNumber
+      this.mostraModalNumero = true;
+
+      // Verifica se tutti i numeri sono stati estratti
+      const tuttiNumeriEstratti = this.numeriEstratti.length === 90;
+
+      if (tuttiNumeriEstratti) {
+        // Se tutti i numeri sono stati estratti, mostra il modale di fine partita
+        this.mostraModalPartitaFinita = true;
+        // Imposta la variabile partitaFinita a true (se necessario)
+        this.partitaFinita = true;
+      }
+
+      setTimeout(() => {
+        this.mostraModalNumero = false;
+      }, 3000);
+    },
+    partitaReset() {
+      this.mostraResettaPartita = true;
+    },
+    resettaPartita() {
+      // Resetta tutte le variabili per iniziare una nuova partita
+      this.mostraModalNumero = false;
+      this.mostraModalPartitaFinita = false;
+      this.numeroCasuale = null;
+      this.numeriEstratti = [];
+      this.partitaFinita = false;
+      this.mostraResettaPartita = false;
+      this.nuovaPartita = false;
     }
   }
 };
@@ -128,6 +190,14 @@ export default {
   color: #A63F03;
   margin-right: .4rem;
   margin-bottom: .7rem;
+}
+
+.numero.estratto {
+  background-color: #A63F03;
+}
+
+.numero.estratto p.bianco {
+  color: white;
 }
 
 .numero:nth-child(6) {

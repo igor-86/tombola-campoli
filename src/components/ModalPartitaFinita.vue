@@ -1,7 +1,10 @@
 <template>
-    <div v-if="isVisible" class="modalnumber">
-        <h3>Numero estratto</h3>
+    <div v-if="isVisible" class="modalFinish">
+        <h3>L'ulimo numero estratto:</h3>
         <p v-if="numeroEstratto">{{ numeroEstratto }}</p>
+        <h3>La partita è finita</h3>
+
+        <button @click="resettaPartita">Nuova partita</button>
     </div>
     <div v-if="isVisible" class="velo"></div>
 </template>
@@ -13,20 +16,22 @@ export default {
         isVisible: Boolean,
         numeroEstratto: Number
     },
-
+    emits: ['resetta-partita'],
     data() {
         return {
 
         };
     },
     methods: {
-
+        resettaPartita() {
+            this.$emit('resetta-partita');
+        }
     }
 }
 </script>
 
 <style scoped>
-.modalnumber {
+.modalFinish {
     width: 65%;
     height: 75vh;
     background-color: white;
@@ -40,6 +45,10 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.modalFinish h3 {
+    margin-bottom: 2rem;
 }
 
 .velo {
